@@ -1,14 +1,9 @@
-import { personalData } from "@/utils/data/personal-data";
-import AboutSection from "./components/homepage/about";
-import Blog from "./components/homepage/blog";
-import ContactSection from "./components/homepage/contact";
-import Education from "./components/homepage/education";
-import Experience from "./components/homepage/experience";
-import HeroSection from "./components/homepage/hero-section";
-import Projects from "./components/homepage/projects";
-import Skills from "./components/homepage/skills";
+// @flow strict
 
-async function getData() {
+import { personalData } from "@/utils/data/personal-data";
+import BlogCard from "../components/homepage/blog/blog-card";
+
+async function getBlogs() {
   const res = await fetch(`https://dev.to/api/articles?username=${personalData.devUsername}`)
 
   if (!res.ok) {
@@ -16,25 +11,34 @@ async function getData() {
   }
 
   const data = await res.json();
-
-  const filtered = data.filter((item) => item?.cover_image).sort(() => Math.random() - 0.5);
-
-  return filtered;
+  return data;
 };
 
-export default async function Home() {
-  const blogs = await getData();
+async function page() {
+  const blogs = await getBlogs();
 
   return (
-    <div suppressHydrationWarning >
-      <HeroSection />
-      <AboutSection />
-      <Experience />
-      <Skills />
-      <Projects />
-      <Education />
-      <Blog blogs={blogs} />
-      <ContactSection />
+    <div className="py-8">
+      <div className="flex justify-center my-5 lg:py-8">
+        <div className="flex  items-center">
+          <span className="w-24 h-[2px] bg-[#1a1443]"></span>
+          <span className="bg-[#1a1443] w-fit text-white p-2 px-5 text-2xl rounded-md">
+            All Blog
+          </span>
+          <span className="w-24 h-[2px] bg-[#1a1443]"></span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-5 lg:gap-8 xl:gap-10">
+        {
+          blogs.map((blog, i) => (
+            blog?.cover_image &&
+            <BlogCard blog={blog} key={i} />
+          ))
+        }
+      </div>
     </div>
-  )
+  );
 };
+
+export default page;
